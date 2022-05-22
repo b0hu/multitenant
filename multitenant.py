@@ -90,7 +90,7 @@ class sdn_vlan(app_manager.RyuApp):
                 data = msg.data
 
             out = parser.OFPPacketOut(datapath=datapath, buffer_id=msg.buffer_id,in_port=in_port, actions=actions, data=data)
-            datapath.send_msg(out
+            datapath.send_msg(out)
 
         else:
             match = parser.OFPMatch(in_port=in_port, eth_dst=dst, eth_src=src)

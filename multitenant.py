@@ -2,7 +2,7 @@ from operator import attrgetter
 from ryu.base import app_manager
 from ryu.app.simple_switch_13 import add_flow
 from ryu.controller import ofp_event
-from ryu.controller.handler import MAIN_DISPATCHER, DEAD_DISPATCHER
+from ryu.controller.handler import CONFIG_DISPATCHER, MAIN_DISPATCHER, DEAD_DISPATCHER
 from ryu.controller.handler import set_ev_cls
 from ryu.lib import hub
 from ryu.lib.packet import packet

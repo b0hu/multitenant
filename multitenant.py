@@ -58,8 +58,8 @@ class sdn_vlan(app_manager.RyuApp):
 
         dst = eth.dst
         src = eth.src
-
-        dpid = datapath.id
+        
+        dpid = format(datapath.id, "d").zfill(16)
 
         self.mac_to_port.setdefault(dpid, {})
         self.mac_to_port[dpid][src] = in_port
@@ -69,7 +69,7 @@ class sdn_vlan(app_manager.RyuApp):
             if dst in self.mac_to_port[dpid]:
                 out_port = self.mac_to_port[dpid][dst]
             
-            elif self.vlan_set[dst]==self.vlan_set[src]:
+            else:
                 out_port = ofproto.OFPP_FLOOD
             
 

@@ -105,3 +105,18 @@ class sdn_vlan(app_manager.RyuApp):
         instruction = [parser.OFPInstructionActions(ofproto.OFPIT_CLEAR_ACTIONS, [])]
         msg = parser.OFPFlowMod(datapath,table_id = OFDPA_FLOW_TABLE_ID_ACL_POLICY,priority = priority,command = ofproto.OFPFC_ADD,match = match,instructions = instruction)
         datapath.send_msg(msg)
+                           
+    def add_flow(self, datapath, priority, match, actions, buffer_id=None):
+        ofproto = datapath.ofproto
+        parser = datapath.ofproto_parser
+
+        inst = [parser.OFPInstructionActions(ofproto.OFPIT_APPLY_ACTIONS,
+                                             actions)]
+        if buffer_id:
+            mod = parser.OFPFlowMod(datapath=datapath, buffer_id=buffer_id,
+                                    priority=priority, match=match,
+                                    instructions=inst)
+        else:
+            mod = parser.OFPFlowMod(datapath=datapath, priority=priority,
+                                    match=match, instructions=inst)
+        datapath.send_msg(mod)

@@ -10,7 +10,7 @@ from ryu.lib.packet import ethernet
 
 class sdn_vlan(app_manager.RyuApp):
     def __init__(self, *args, **kwargs):
-        super(SimpleMonitor13, self).__init__(*args, **kwargs)
+        super(sdn_vlan, self).__init__(*args, **kwargs)
         self.mac_to_port = {}
         self.vlan_set = {
                 '00:00:00:00:00:01':2,

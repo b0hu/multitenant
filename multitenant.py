@@ -38,10 +38,12 @@ class sdn_vlan(app_manager.RyuApp):
         ofproto = datapath.ofproto
         parser = datapath.ofproto_parser
         match = parser.OFPMatch()
-
+        
+        self.logger.info("switch features in %s", datapath)
         #send unkown packets to controller
         actions = [parser.OFPActionOutput(ofproto.OFPP_CONTROLLER,ofproto.OFPCML_NO_BUFFER)]
         self.add_flow(datapath, 0, match, actions)
+        self.logger.info("send to controller")
     
 
     @set_ev_cls(ofp_event.EventOFPPacketIn, MAIN_DISPATCHER)
@@ -104,7 +106,7 @@ class sdn_vlan(app_manager.RyuApp):
         ofproto = datapath.ofproto
         parser = datapath.ofproto_parser
         instruction = [parser.OFPInstructionActions(ofproto.OFPIT_CLEAR_ACTIONS, [])]
-        msg = parser.OFPFlowMod(datapath,table_id = OFDPA_FLOW_TABLE_ID_ACL_POLICY,priority = priority,command = ofproto.OFPFC_ADD,match = match,instructions = instruction)
+        msg = parser.OFPFlowMod(datapath,priority = priority,command = ofproto.OFPFC_ADD,match = match,instructions = instruction)
         datapath.send_msg(msg)
                            
     def add_flow(self, datapath, priority, match, actions, buffer_id=None):

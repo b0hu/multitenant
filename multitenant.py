@@ -119,7 +119,7 @@ class sdn_vlan(app_manager.RyuApp):
                 out_port = self.mac_to_port[dpid][dst]
             
             elif dst == 'ff:ff:ff:ff:ff:ff':
-                all = self.vlan_group[self.vlan_set[dst]]-{dst}
+                all = self.vlan_group[self.vlan_set[src]]-{src}
                 out_port = [self.mac_to_port[i] for i in all]
             
             else:

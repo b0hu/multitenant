@@ -111,7 +111,15 @@ class sdn_vlan(app_manager.RyuApp):
         self.mac_to_port[dpid][src] = in_port
         self.logger.info("packet in dpid:%s, src:%s, dst:%s, in_port:%s", dpid, src, dst, in_port)
         
-        if (dst in self.hosts and src in self.hosts) or self.vlan_set[dst]==self.vlan_set[src]:
+        if dst not in self.hosts or src not in self.hosts:
+            #self.logger.debug("invalid! src:%s, dst:%s", src, dst)
+            match = parser.OFPMatch(in_port=in_port, eth_dst=dst, eth_src=src)
+            self.drop_flow(datapath, 1, match)
+        
+        elif self.vlan_set[dst]==self.vlan_set[src]:
+            match = parser.OFPMatch(in_port=in_port, eth_dst=dst, eth_src=src)
+            self.drop_flow(datapath, 1, match)
+        else:
 
             if dst in self.mac_to_port[dpid]:
                 out_port = self.mac_to_port[dpid][dst]
@@ -151,10 +159,6 @@ class sdn_vlan(app_manager.RyuApp):
 
             out = parser.OFPPacketOut(datapath=datapath, buffer_id=msg.buffer_id,in_port=in_port, actions=actions, data=data)
             datapath.send_msg(out)
-        else:
-            #self.logger.debug("invalid! src:%s, dst:%s", src, dst)
-            match = parser.OFPMatch(in_port=in_port, eth_dst=dst, eth_src=src)
-            self.drop_flow(datapath, 1, match)
 
 
 

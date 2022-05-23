@@ -113,12 +113,12 @@ class sdn_vlan(app_manager.RyuApp):
             self.logger.debug("invalid! src:%s, dst:%s", src, dst)
             return
 
-        elif dst == {'ff:ff:ff:ff:ff:ff'} or self.vlan_set[dst]==self.vlan_set[src]:
+        elif dst == 'ff:ff:ff:ff:ff:ff' or self.vlan_set[dst]==self.vlan_set[src]:
 
             if dst in self.mac_to_port[dpid]:
                 out_port = self.mac_to_port[dpid][dst]
             
-            elif dst == {'ff:ff:ff:ff:ff:ff'}:
+            elif dst == 'ff:ff:ff:ff:ff:ff':
                 all = self.vlan_group[self.vlan_set[dst]]-{dst}
                 out_port = [self.mac_to_port[i] for i in all]
             

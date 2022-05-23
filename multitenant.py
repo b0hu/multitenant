@@ -1,6 +1,5 @@
 from operator import attrgetter
 from ryu.base import app_manager
-#from ryu.app.simple_switch_13 import add_flow
 from ryu.controller import ofp_event
 from ryu.controller.handler import CONFIG_DISPATCHER, MAIN_DISPATCHER
 from ryu.controller.handler import set_ev_cls
@@ -30,6 +29,24 @@ class sdn_vlan(app_manager.RyuApp):
                 '00:00:00:00:00:0f':1,
                 '00:00:00:00:00:10':2,
             }
+        self.hosts = {
+                '00:00:00:00:00:01',
+                '00:00:00:00:00:02',
+                '00:00:00:00:00:03',
+                '00:00:00:00:00:04',
+                '00:00:00:00:00:05',
+                '00:00:00:00:00:06',
+                '00:00:00:00:00:07',
+                '00:00:00:00:00:08',
+                '00:00:00:00:00:09',
+                '00:00:00:00:00:0a',
+                '00:00:00:00:00:0b',
+                '00:00:00:00:00:0c',
+                '00:00:00:00:00:0d',
+                '00:00:00:00:00:0e',
+                '00:00:00:00:00:0f',
+                '00:00:00:00:00:10',
+            }
     
     @set_ev_cls(ofp_event.EventOFPSwitchFeatures, CONFIG_DISPATCHER)
     def switch_features_handler(self, ev):
@@ -39,7 +56,7 @@ class sdn_vlan(app_manager.RyuApp):
         parser = datapath.ofproto_parser
         match = parser.OFPMatch()
         
-        self.logger.info("switch features in %s", datapath)
+        #self.logger.info("switch features in %s", datapath)
         #send unkown packets to controller
         actions = [parser.OFPActionOutput(ofproto.OFPP_CONTROLLER,ofproto.OFPCML_NO_BUFFER)]
         self.add_flow(datapath, 0, match, actions)
@@ -66,8 +83,11 @@ class sdn_vlan(app_manager.RyuApp):
         self.mac_to_port.setdefault(dpid, {})
         self.mac_to_port[dpid][src] = in_port
         self.logger.info("packet in dpid:%s, src:%s, dst:%s, in_port:%s", dpid, src, dst, in_port)
-
-        if self.vlan_set[dst]==self.vlan_set[src]:
+        
+        if dst not in self.hosts or src not in self.hosts:
+            self.logger.debug('invalid! src:%s, dst:%s'src,dst)
+            return
+        elif self.vlan_set[dst]==self.vlan_set[src]:
 
             if dst in self.mac_to_port[dpid]:
                 out_port = self.mac_to_port[dpid][dst]

@@ -46,6 +46,7 @@ class sdn_vlan(app_manager.RyuApp):
                 '00:00:00:00:00:0e',
                 '00:00:00:00:00:0f',
                 '00:00:00:00:00:10',
+                'ff:ff:ff:ff:ff:ff'
             }
         self.vlan_group = {
             1:{
@@ -111,10 +112,15 @@ class sdn_vlan(app_manager.RyuApp):
         if dst not in self.hosts or src not in self.hosts:
             self.logger.debug("invalid! src:%s, dst:%s", src, dst)
             return
+
         elif self.vlan_set[dst]==self.vlan_set[src]:
 
             if dst in self.mac_to_port[dpid]:
                 out_port = self.mac_to_port[dpid][dst]
+            
+            elif dst == 'ff:ff:ff:ff:ff:ff':
+                all = vlan_group[vlan_set[dst]]-{dst}
+                out_port = [mac_to_port[i] for i in all]
             
             else:
                 out_port = ofproto.OFPP_FLOOD
@@ -142,8 +148,6 @@ class sdn_vlan(app_manager.RyuApp):
         else:
             match = parser.OFPMatch(in_port=in_port, eth_dst=dst, eth_src=src)
             self.drop_flow(datapath, 1, match)
-            #out = parser.OFPPacketOut(datapath=datapath, buffer_id=msg.buffer_id,in_port=in_port, actions=actions, data=data)
-            #datapath.send_msg(out)
 
 
     def drop_flow(self, datapath, priority, match):
@@ -157,8 +161,7 @@ class sdn_vlan(app_manager.RyuApp):
         ofproto = datapath.ofproto
         parser = datapath.ofproto_parser
 
-        inst = [parser.OFPInstructionActions(ofproto.OFPIT_APPLY_ACTIONS,
-                                             actions)]
+        inst = [parser.OFPInstructionActions(ofproto.OFPIT_APPLY_ACTIONS,actions)]
         if buffer_id:
             mod = parser.OFPFlowMod(datapath=datapath, buffer_id=buffer_id,
                                     priority=priority, match=match,
@@ -167,3 +170,13 @@ class sdn_vlan(app_manager.RyuApp):
             mod = parser.OFPFlowMod(datapath=datapath, priority=priority,
                                     match=match, instructions=inst)
         datapath.send_msg(mod)
+
+#address = vlan_group[vlan_set[dst]]-{dst}
+#out_port = [mac_to_port[i] for i in address]
+#actions = [parser.OFPActionOutput(out_port)]
+
+#not valid -> drop
+#the same vlan memorized -> actions, add
+#the same vlan not memorized -> actions, add
+#fffff -> actions, add
+#different -> drop

@@ -85,7 +85,7 @@ class sdn_vlan(app_manager.RyuApp):
         self.logger.info("packet in dpid:%s, src:%s, dst:%s, in_port:%s", dpid, src, dst, in_port)
         
         if dst not in self.hosts or src not in self.hosts:
-            self.logger.debug('invalid! src:%s, dst:%s'src,dst)
+            self.logger.debug("invalid! src:%s, dst:%s", src, dst)
             return
         elif self.vlan_set[dst]==self.vlan_set[src]:
 

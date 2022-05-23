@@ -29,6 +29,7 @@ class sdn_vlan(app_manager.RyuApp):
                 '00:00:00:00:00:0f':1,
                 '00:00:00:00:00:10':2,
             }
+        self.vlan_set.setdefault("ff:ff:ff:ff:ff:ff", {})
         self.hosts = {
                 '00:00:00:00:00:01',
                 '00:00:00:00:00:02',

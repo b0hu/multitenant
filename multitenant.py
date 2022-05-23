@@ -124,6 +124,7 @@ class sdn_vlan(app_manager.RyuApp):
                 for i in all:
                     if i in self.mac_to_port[dpid]:
                         out_port = out_port.append(self.mac_to_port[dpid][i])
+                self.logger.info("ff:ff:ff:ff:ff:ff:%s",out_port)
             
             else:
                 out_port = ofproto.OFPP_FLOOD

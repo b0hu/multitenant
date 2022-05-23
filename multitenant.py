@@ -103,9 +103,7 @@ class sdn_vlan(app_manager.RyuApp):
         eth = pkt.get_protocols(ethernet.ethernet)[0]
 
         dst = eth.dst
-        dst = format(dst, "d").zfill(16)
         src = eth.src
-        src = format(src, "d").zfill(16)
         
         dpid = format(datapath.id, "d").zfill(16)
 
@@ -138,6 +136,7 @@ class sdn_vlan(app_manager.RyuApp):
                         out_port = out_port.append(self.mac_to_port[dpid][i])
                 self.logger.info("ff:ff:ff:ff:ff:ff:%s",out_port)
                 #if not out_port:
+
 
             
             else:

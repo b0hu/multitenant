@@ -111,15 +111,7 @@ class sdn_vlan(app_manager.RyuApp):
         self.mac_to_port[dpid][src] = in_port
         self.logger.info("packet in dpid:%s, src:%s, dst:%s, in_port:%s", dpid, src, dst, in_port)
         
-        if dst not in self.hosts or src not in self.hosts:
-            self.logger.debug("invalid! src:%s, dst:%s", src, dst)
-            return
-        
-        elif dst not in self.hosts or self.vlan_set[dst]!=self.vlan_set[src]:
-            match = parser.OFPMatch(in_port=in_port, eth_dst=dst, eth_src=src)
-            self.drop_flow(datapath, 1, match)
-
-        else:
+        if (dst in self.hosts and src in self.hosts) or self.vlan_set[dst]==self.vlan_set[src]:
 
             if dst in self.mac_to_port[dpid]:
                 out_port = self.mac_to_port[dpid][dst]
@@ -135,10 +127,9 @@ class sdn_vlan(app_manager.RyuApp):
                         self.logger.info("mac_to_port[dpid][i]:%s",self.mac_to_port[dpid][i])
                         out_port = out_port.append(self.mac_to_port[dpid][i])
                 self.logger.info("ff:ff:ff:ff:ff:ff:%s",out_port)
-                #if not out_port:
+                if not out_port:
+                    out_port = ofproto.OFPP_FLOOD
 
-
-            
             else:
                 out_port = ofproto.OFPP_FLOOD
 
@@ -160,8 +151,10 @@ class sdn_vlan(app_manager.RyuApp):
 
             out = parser.OFPPacketOut(datapath=datapath, buffer_id=msg.buffer_id,in_port=in_port, actions=actions, data=data)
             datapath.send_msg(out)
-
-
+        else:
+            #self.logger.debug("invalid! src:%s, dst:%s", src, dst)
+            match = parser.OFPMatch(in_port=in_port, eth_dst=dst, eth_src=src)
+            self.drop_flow(datapath, 1, match)
 
 
 
@@ -186,9 +179,6 @@ class sdn_vlan(app_manager.RyuApp):
                                     match=match, instructions=inst)
         datapath.send_msg(mod)
 
-#address = vlan_group[vlan_set[dst]]-{dst}
-#out_port = [mac_to_port[i] for i in address]
-#actions = [parser.OFPActionOutput(out_port)]
 
 #not valid -> drop
 #the same vlan memorized -> actions, add

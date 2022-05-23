@@ -123,9 +123,9 @@ class sdn_vlan(app_manager.RyuApp):
                 self.logger.info("all address:%s",all)
                 out_port = []
                 for i in all:
-                    if i in self.mac_to_port[dpid]:
-                        self.logger("i:%s",i)
-                        self.logger("mac_to_port[dpid][i]:%s",self.mac_to_port[dpid][i])
+                    self.logger.info("i:%s",i)
+                    if i in self.mac_to_port[dpid]
+                        self.logger.info("mac_to_port[dpid][i]:%s",self.mac_to_port[dpid][i])
                         out_port = out_port.append(self.mac_to_port[dpid][i])
                 self.logger.info("ff:ff:ff:ff:ff:ff:%s",out_port)
                 if not out_port:

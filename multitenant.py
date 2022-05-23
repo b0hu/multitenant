@@ -116,7 +116,7 @@ class sdn_vlan(app_manager.RyuApp):
             match = parser.OFPMatch(in_port=in_port, eth_dst=dst, eth_src=src)
             self.drop_flow(datapath, 1, match)
         
-        elif self.vlan_set[dst]==self.vlan_set[src]:
+        elif self.vlan_set[dst]!=self.vlan_set[src]:
             match = parser.OFPMatch(in_port=in_port, eth_dst=dst, eth_src=src)
             self.drop_flow(datapath, 1, match)
         else:

@@ -138,7 +138,6 @@ class sdn_vlan(app_manager.RyuApp):
             
             else:
                 out_port = ofproto.OFPP_FLOOD
-            
 
             actions = [parser.OFPActionOutput(out_port)]
 

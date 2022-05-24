@@ -144,7 +144,6 @@ class sdn_vlan(app_manager.RyuApp):
                 self.logger.info("ff:ff:ff:ff:ff:ff:%s",out_port)
                 if not out_port:
                     out_port = ofproto.OFPP_FLOOD
-                    return
 
             else:
                 out_port = ofproto.OFPP_FLOOD

@@ -131,7 +131,7 @@ class sdn_vlan(app_manager.RyuApp):
                     self.logger.info("mac_to_port[dpid]:%s",self.mac_to_port[dpid])
                     if i in self.mac_to_port[dpid]:
                         self.logger.info("mac_to_port[dpid][i]:%s",self.mac_to_port[dpid][i])
-                        out_port = out_port.append(self.mac_to_port[dpid][i])
+                        out_port.append(self.mac_to_port[dpid][i])
                     '''else:
                         unkown_out.append(i)
                         match2 = parser.OFPMatch(in_port=in_port, eth_dst=i, eth_src=src)

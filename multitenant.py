@@ -1,4 +1,3 @@
-from operator import attrgetter
 from ryu.base import app_manager
 from ryu.controller import ofp_event
 from ryu.controller.handler import CONFIG_DISPATCHER, MAIN_DISPATCHER
@@ -120,7 +119,6 @@ class sdn_vlan(app_manager.RyuApp):
             match = parser.OFPMatch(in_port=in_port, eth_dst=dst, eth_src=src)
             self.drop_flow(datapath, 1, match)
         else:
-
             if dst in self.mac_to_port[dpid]:
                 out_port = self.mac_to_port[dpid][dst]
             
@@ -135,11 +133,8 @@ class sdn_vlan(app_manager.RyuApp):
                         self.logger.info("mac_to_port[dpid][i]:%s",self.mac_to_port[dpid][i])
                         out_port = out_port.append(self.mac_to_port[dpid][i])
                 self.logger.info("ff:ff:ff:ff:ff:ff:%s",out_port)
-                '''if out_port:
-                    self.add_flow(datapath, 1, match, actions)
-                    return
-                else:
-                    out_port = ofproto.OFPP_FLOOD'''
+                if not out_port:
+                    out_port = ofproto.OFPP_FLOOD
 
             else:
                 out_port = ofproto.OFPP_FLOOD

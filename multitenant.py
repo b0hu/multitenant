@@ -112,10 +112,12 @@ class sdn_vlan(app_manager.RyuApp):
         
         if dst not in self.hosts or src not in self.hosts:
             #self.logger.debug("invalid! src:%s, dst:%s", src, dst)
+            self.logger.info("if")
             match = parser.OFPMatch(in_port=in_port, eth_dst=dst, eth_src=src)
             self.drop_flow(datapath, 1, match)
 
         elif self.vlan_set[dst]==self.vlan_set[src] or dst=='ff:ff:ff:ff:ff:ff':
+            self.logger.info("elif")
             if dst in self.mac_to_port[dpid]:
                 out_port = self.mac_to_port[dpid][dst]
             
@@ -130,10 +132,14 @@ class sdn_vlan(app_manager.RyuApp):
                     if i in self.mac_to_port[dpid]:
                         self.logger.info("mac_to_port[dpid][i]:%s",self.mac_to_port[dpid][i])
                         out_port = out_port.append(self.mac_to_port[dpid][i])
-                    '''else:
+                    else:
                         unkown_out.append(i)
                         match2 = parser.OFPMatch(in_port=in_port, eth_dst=i, eth_src=src)
-                        out_port2 = ofproto.OFPP_FLOOD'''
+                        out_port2 = ofproto.OFPP_FLOOD
+
+                        actions = [parser.OFPActionOutput(out_port2)]
+                        out = parser.OFPPacketOut(datapath=datapath, buffer_id=msg.buffer_id,in_port=in_port, actions=actions, data=data)
+                        datapath.send_msg(out)
 
                 self.logger.info("ff:ff:ff:ff:ff:ff:%s",out_port)
                 if not out_port:
@@ -162,6 +168,7 @@ class sdn_vlan(app_manager.RyuApp):
             datapath.send_msg(out)
 
         else:
+            self.logger.info("else")
             match = parser.OFPMatch(in_port=in_port, eth_dst=dst, eth_src=src)
             self.drop_flow(datapath, 1, match)
 
@@ -185,7 +192,7 @@ class sdn_vlan(app_manager.RyuApp):
             mod = parser.OFPFlowMod(datapath=datapath, priority=priority,
                                     match=match, instructions=inst)
         datapath.send_msg(mod)
-
+    
 
 #not valid -> drop
 #the same vlan memorized -> actions, add

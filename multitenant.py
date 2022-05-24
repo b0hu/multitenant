@@ -114,11 +114,8 @@ class sdn_vlan(app_manager.RyuApp):
             #self.logger.debug("invalid! src:%s, dst:%s", src, dst)
             match = parser.OFPMatch(in_port=in_port, eth_dst=dst, eth_src=src)
             self.drop_flow(datapath, 1, match)
-        
-        elif self.vlan_set[dst]!=self.vlan_set[src]:
-            match = parser.OFPMatch(in_port=in_port, eth_dst=dst, eth_src=src)
-            self.drop_flow(datapath, 1, match)
-        else:
+
+        elif self.vlan_set[dst]==self.vlan_set[src] or dst=='ff:ff:ff:ff:ff:ff':
             if dst in self.mac_to_port[dpid]:
                 out_port = self.mac_to_port[dpid][dst]
             
@@ -126,15 +123,21 @@ class sdn_vlan(app_manager.RyuApp):
                 all = self.vlan_group[self.vlan_set[src]]-{src}
                 self.logger.info("all address:%s",all)
                 out_port = []
+                unkown_out = []
                 for i in all:
                     self.logger.info("i:%s",i)
                     self.logger.info("mac_to_port[dpid]:%s",self.mac_to_port[dpid])
                     if i in self.mac_to_port[dpid]:
                         self.logger.info("mac_to_port[dpid][i]:%s",self.mac_to_port[dpid][i])
                         out_port = out_port.append(self.mac_to_port[dpid][i])
+                    '''else:
+                        unkown_out.append(i)
+                        match2 = parser.OFPMatch(in_port=in_port, eth_dst=i, eth_src=src)
+                        out_port2 = ofproto.OFPP_FLOOD'''
+
                 self.logger.info("ff:ff:ff:ff:ff:ff:%s",out_port)
                 if not out_port:
-                    out_port = ofproto.OFPP_FLOOD
+                    return
 
             else:
                 out_port = ofproto.OFPP_FLOOD
@@ -158,7 +161,9 @@ class sdn_vlan(app_manager.RyuApp):
             out = parser.OFPPacketOut(datapath=datapath, buffer_id=msg.buffer_id,in_port=in_port, actions=actions, data=data)
             datapath.send_msg(out)
 
-
+        else:
+            match = parser.OFPMatch(in_port=in_port, eth_dst=dst, eth_src=src)
+            self.drop_flow(datapath, 1, match)
 
     def drop_flow(self, datapath, priority, match):
         ofproto = datapath.ofproto
